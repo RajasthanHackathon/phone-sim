@@ -27,8 +27,19 @@ var speech = window.speechSynthesis;
 console.log(speech.getVoices());
 
 var strings= [
-    "Press 1 to req",
-    "Press 2 to update",
+    "Welcome to Blood Donor Finder." +
+    "Press 1 to request blood." +
+    "Press 2 to update donor's profile",
+    "Press 1 for A positive " +
+    "Press 2 for B positive" +
+    "Press 3 for AB positive" +
+    "Press 4 for O positive" +
+    "Press 5 for A negative" +
+    "Press 6 for B negative" +
+    "Press 7 for AB negative" +
+    "Press 8 for O negative",
+    "Enter your 6 digit pincode.",
+    "Your request has been successfully placed.",
     "Settings saved"
 ];
 
@@ -66,7 +77,7 @@ $('.action-dig').click(function(){
                     timeCounterLoop();
 
                     state = 1;
-                    voice(strings[1]);
+                    voice(strings[0]);
 
                     $('.pulsate').toggleClass('active-call');
                     $('.ca-status').animate({
@@ -155,19 +166,22 @@ var addAnimationToButton = function(thisButton){
     },1);
 };
 
-
+var voiceTimeout = null;
 var voice = function (mess){
-    speech.cancel();
+    if(speech.speaking) {
+        speech.cancel();
+        if (voiceTimeout !== null)
+            clearTimeout(voiceTimeout);
+
+        voiceTimeout = setTimeout(function () { voice(mess); }, 250);
+    }
     var msg ;
-    setTimeout(function(){
-        msg = new SpeechSynthesisUtterance();
-        msg.text = mess;
-        msg.lang = 'en-US';
-        msg.rate = 0.7;
-        msg.volume = 1;
-        speech.speak(msg)
-    },1000);
-    // speech.speak(msg);
+    msg = new SpeechSynthesisUtterance();
+    msg.text = mess;
+    msg.lang = 'en-US';
+    msg.rate = 0.7;
+    msg.volume = 1;
+    speech.speak(msg)
     return msg;
 };
 
@@ -191,35 +205,37 @@ $('.callpad-dig').click(function(){
 
 var audiocontrol = function(number) {
     
-    switch(state) {
+    switch(parseInt(state)) {
         case 1:
 
         console.log(number,"State = ",state);
-            switch(number){
+            switch(parseInt(number)){
                 case 1:state = 2;voice(strings[1]);break;
                 case 2:state = 6;voice(strings[1]);break;
             }break;
         case 2:
             if(number>0 && number<9) {
                 state = 3;
-                voice(strings[1]);
+                group = number;
+                voice(strings[2]);
             }else
-                voice(strings[1]);
+                voice(strings[5]);
             break;
         case 3:
             if(pincode.length<6)
-                pincode= pincode + str(number);
+                pincode= pincode + number;
             if(pincode.length == 6) {
                 state = 4;
-                var temp = voice(strings[1]);
+                var temp = voice(strings[3]);
                 temp.onend = endCall;
+                sendreq(mob,pincode,group);
                 break;
             }
             break;
         case 6:
             state = 7;
             update_status(mob,number);
-            var temp = voice(strings[1]);
+            var temp = voice(strings[4]);
             temp.onend = endCall;
             break;
         
@@ -233,4 +249,7 @@ var endCall = function() {
     $('.pulsate').toggleClass('active-call');
 
     $('.phoneString input').val('');
+    state = 0;
+    pincode = '';
+    $('.ca-input input').val('');
 }
