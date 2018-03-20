@@ -1,37 +1,36 @@
 function sendreq(mob,pincode,blood_grp) {
-    if(mob.length!=10)
-        return 1;
-    if(pincode.length!=6)
-        return 2;
-    axios.post('/api/request', {
+    console.log("TEST");
+    
+    $.post("/api/request", {
         "phone":mob,
         "pincode":pincode,
         "group":blood_grp
-    }).then(function(response) {
-        console.log(response);        
-    }).catch(function(response) {
-        console.log(response);        
-    });
+    }).done(function() {
+        console.log( "req sent" );
+      })
+      .fail(function() {
+        alert( "error" );
+      })
 }
 function register(mob,fam_id,blood_grp) {
     blood_grp = blood_grp.toUpperCase();
-    axios.post("/api/register", {
+    $.post("/api/register", {
         "phone":mob,
         "family_id":fam_id,
         "group":blood_grp
-    }).then(function(response) {
+    }).done(function(response) {
         console.log(response);        
-    }).catch(function(response) {
+    }).fail(function(response) {
         console.log(response);        
     });
 }
 function update_status(mob,new_status) {
-    axios.post("/api/update", {
+    $.post("/api/update", {
         "phone":mob,
         "status":new_status
-    }).then(function(response) {
+    }).done(function(response) {
         console.log(response);        
-    }).catch(function(response) {
+    }).fail(function(response) {
         console.log(response);        
     });
 }
