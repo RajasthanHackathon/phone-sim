@@ -222,7 +222,7 @@ body {
     position: relative;
     display: block;
     margin: 0 auto 0;
-    top: 120px;
+    top: 60px;
     transition: opacity 0.5s ease;
 }
 .pad .call-pad .pulsate.active-call {
@@ -254,8 +254,7 @@ body {
 .pad .call-pad .ca-avatar {
     width: 100px;
     height: 100px;
-    margin: 70px auto;
-    margin-bottom: 30px;
+    margin: 10px auto;
     display: block;
     background-color: #111111;
     border-radius: 100%;
@@ -277,7 +276,6 @@ body {
     color: white;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 15px;
 }
 .pad .call-pad .ca-name {
     font-size: 18px;
@@ -288,8 +286,8 @@ body {
 }
 .pad .call-pad .ca-status {
     font-size: 30px;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    /* margin-top: 40px; */
+    /* margin-bottom: 40px; */
 }
 .pad .call-pad .ca-status:after {
     content: attr(data-dots);
@@ -540,4 +538,66 @@ p img {
     height: 20px;
     position: relative;
     top: 6px;
+}
+
+/* Additional */
+.pad .call-pad .ca-input {
+    width: 100%;
+    height: 80px;
+    background-color: #2D2D2D4D;
+    /* margin-top: 40px; */
+}
+.pad .call-pad .ca-input input {
+    background-color: transparent;
+    width: 60%;
+    margin-left: 20%;
+    height: 80px;
+    border: none;
+    font-size: 30px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+.pad .call-pad .ca-input input:focus {
+    outline: none;
+}
+
+.pad .call-pad .digits .dig {
+    color: #222222;
+    font-size: 30px;
+    float: left;
+    background-color: #E5E5E5;
+    text-align: center;
+    width: 60px;
+    height: 56px;
+    border-radius: 100%;
+    margin: 10px 0px;
+    padding-top: 4px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.pad .call-pad .digits {
+    overflow: hidden;
+    width: 60%;
+    margin-left: 20%;
+}
+.pad .call-pad .digits .dig.clicked {
+    animation: pulse-gray linear 0.5s 1;
+}
+.pad .call-pad .digits .dig:nth-child(3n-1) {
+    margin: 10px calc(50% - 90px);
+}
+.pad .call-pad .digits .dig.astrisk {
+    padding-top: 17px;
+    height: 43px;
+}
+.pad .call-pad .digits .dig.pound {
+    padding-top: 10px;
+    height: 50px;
+}
+.pad .call-pad .digits .dig .sub-dig {
+    font-size: 8px;
+    font-weight: 300;
+    position: relative;
+    top: -2px;
 }

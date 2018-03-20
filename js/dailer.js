@@ -12,47 +12,61 @@ $('.number-dig').click(function(){
     var currentValue = $('.phoneString input').val();
     var valueToAppend = $(this).attr('name');
     $('.phoneString input').val(currentValue + valueToAppend);
-
-    checkNumber();
 });
 
+var mob = "9876543210";
 
 var timeoutTimer = true;
 var timeCounter = 0;
 var timeCounterCounting = true;
 
+var state = 0;
+var group = 0;
+var pincode = '';
+var speech = window.speechSynthesis;
+console.log(speech.getVoices());
+
+var strings= [
+    "Press 1 to req",
+    "Press 2 to update",
+    "Settings saved"
+];
+
 $('.action-dig').click(function(){
     //add animation
     addAnimationToButton(this);
+    var currentValue = $('.phoneString input').val();
     if($(this).hasClass('goBack')){
-        var currentValue = $('.phoneString input').val();
+        // var currentValue = $('.phoneString input').val();
         var newValue = currentValue.substring(0, currentValue.length - 1);
         $('.phoneString input').val(newValue);
-        checkNumber();
     }else if($(this).hasClass('call')){
         if($('.call-pad').hasClass('in-call')){
             setTimeout(function(){
                 setToInCall();
             }, 500);
+            
             timeCounterCounting = false;
             timeCounter = 0;
             hangUpCall();
             $('.pulsate').toggleClass('active-call');
 
             $('.phoneString input').val('');
-            checkNumber();
         }else{
+            $('.ca-name').html('e-Mitra')
+            $('.ca-number').html(currentValue);
             $('.ca-status').text('Calling');
             setTimeout(function(){
                 setToInCall();
                 timeoutTimer = true;
                 looper();
-                voice("Welcome to Blood Donor Finder. Please Select options to continue.");
-                request();
                 setTimeout(function(){
                     timeoutTimer = false;
                     timeCounterCounting = true;
                     timeCounterLoop();
+
+                    state = 1;
+                    voice(strings[1]);
 
                     $('.pulsate').toggleClass('active-call');
                     $('.ca-status').animate({
@@ -96,10 +110,6 @@ var timeCounterLoop = function(){
 };
 
 var setToInCall = function(){
-    // $('.dial-pad')[0].style.backgroundColor = 'lightblue';
-    // $('.phoneString')[0].style.backgroundColor = "#2d2d2d2b";
-    // $('#callbtn')[0].style.backgroundColor = "red";
-    // $('.call-icon').css('transform','rotate(135deg)');
     $('.call-pad').toggleClass('in-call');
     $('.call-icon').toggleClass('in-call');
     $('.call-change').toggleClass('in-call');
@@ -145,66 +155,82 @@ var addAnimationToButton = function(thisButton){
     },1);
 };
 
-var checkNumber = function(){
-    var numberToCheck = $('.phoneString input').val();
-    var contactMatt = {
-        name: 'Matt Sich',
-        number: '123456789',
-        // image: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/378978/profile/profile-80_1.jpg',
-        desc: 'CodePenner'
-    };
-    var contactHellogiov = {
-        name: 'hellogiov',
-        number: '0651985833',
-        image: 'http://avatars-cdn.producthunt.com/207787/220',
-        desc: 'Publicis Nurun'
-    };
-    if (numberToCheck.length > 0 && contactMatt.number.substring(0, numberToCheck.length) == numberToCheck) {
-        //show this contact!
-        showUserInfo(contactMatt);
-    }else if(numberToCheck.length > 0 && contactHellogiov.number.substring(0, numberToCheck.length) == numberToCheck){
-        showUserInfo(contactHellogiov);
-    }else{
-        hideUserInfo();
-    }
-};
 
-var showUserInfo = function(userInfo){
-    $('.avatar').attr('style', "background-image: url("+userInfo.image+")");
-    if(!$('.contact').hasClass('showContact')){
-        $('.contact').addClass('showContact');
-    }
-    $('.contact-name').text(userInfo.name);
-    $('.contact-position').text(userInfo.desc);
-    var matchedNumbers = $('.phoneString input').val();
-    var remainingNumbers = userInfo.number.substring(matchedNumbers.length);
-    $('.contact-number').html("<span>"+matchedNumbers+"</span>" + remainingNumbers);
-
-    //update call elements
-    $('.ca-avatar').attr('style', 'background-image: url('+userInfo.image+')');
-    $('.ca-name').text(userInfo.name);
-    $('.ca-number').text(userInfo.number);
-
-};
-
-var hideUserInfo = function(){
-    $('.contact').removeClass('showContact');
-    window.speechSynthesis.cancel();
-};
 var voice = function (mess){
-    var msg = new SpeechSynthesisUtterance();
-    msg.text = mess;
-    msg.lang = 'en-US';
-    msg.rate = 1.2;
-    // msg.onend = function(event) { alert('Finished in ' + event.elapsedTime + ' seconds.'); }
-    // speechSynthesis.speak(msg);
-    window.speechSynthesis.speak(msg);
+    speech.cancel();
+    var msg ;
+    setTimeout(function(){
+        msg = new SpeechSynthesisUtterance();
+        msg.text = mess;
+        msg.lang = 'en-US';
+        msg.rate = 0.7;
+        msg.volume = 1;
+        speech.speak(msg)
+    },1000);
+    // speech.speak(msg);
+    return msg;
 };
 
-var request = function () {
-    voice("Press 1 to request blood. Press 2 to update info");
-}
 $('.ca-b-single').click(
     function(){
         console.log($(this))
     });
+
+
+$('.callpad-dig').click(function(){
+    //add animation
+    addAnimationToButton(this);
+    //add number
+    var selected = $(this).attr('name');
+    
+    var currentValue = $('.ca-input input').val();
+    var valueToAppend = selected;
+    $('.ca-input input').val(currentValue + valueToAppend);
+    audiocontrol(selected);
+});
+
+var audiocontrol = function(number) {
+    
+    switch(state) {
+        case 1:
+
+        console.log(number,"State = ",state);
+            switch(number){
+                case 1:state = 2;voice(strings[1]);break;
+                case 2:state = 6;voice(strings[1]);break;
+            }break;
+        case 2:
+            if(number>0 && number<9) {
+                state = 3;
+                voice(strings[1]);
+            }else
+                voice(strings[1]);
+            break;
+        case 3:
+            if(pincode.length<6)
+                pincode= pincode + str(number);
+            if(pincode.length == 6) {
+                state = 4;
+                var temp = voice(strings[1]);
+                temp.onend = endCall;
+                break;
+            }
+            break;
+        case 6:
+            state = 7;
+            update_status(mob,number);
+            var temp = voice(strings[1]);
+            temp.onend = endCall;
+            break;
+        
+    }
+}
+
+var endCall = function() {
+    timeCounterCounting = false;
+    timeCounter = 0;
+    hangUpCall();
+    $('.pulsate').toggleClass('active-call');
+
+    $('.phoneString input').val('');
+}
